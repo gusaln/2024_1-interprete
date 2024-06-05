@@ -1,31 +1,97 @@
 <script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+    import { lexer } from "$lib/parser";
+    import tokenizr from "tokenizr";
+    import Tokens from "./Tokens.svelte";
+
+	
+	let input = `import sys
+import glob
+import serial
+import serial.tools.list_ports
+from pprint import pprint
+
+
+import uuid
+
+
+def getserialport():
+    ports = serial.tools.list_ports.comports()
+
+    if len(ports) < 1:
+        print("No serial port connected")
+        exit(1)
+        
+    return ports[0]
+
+if __name__ == '__main__':
+    # print(serial_ports())
+
+    port = getserialport()
+    s = serial.Serial(port.device, 115200)
+
+    uid = uuid.uuid4()
+
+
+    print("Waiting for card")
+
+
+    s.close()`;
+	/**
+     * @type {import('tokenizr').Token[]}
+     */
+	let tokens = [];
+
+	$: tokensJson = JSON.stringify(tokens, null, 2)
+
+	function parse() {
+		tokens = []
+		lexer.input(input)
+		while (true) {
+			try {
+				tokens[tokens.length] = lexer.token()
+			} catch (error) {
+				if (error instanceof tokenizr.ParsingError) {	
+					console.log({error})
+				}
+				console.error(error)
+				break;
+			}
+
+            if (tokens[tokens.length-1] .type == "EOF") {
+                break
+            }
+		}
+	}
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>Parser</title>
+	<meta name="description" content="Parser" />
 </svelte:head>
 
 <section>
 	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
+		Parse Python
 	</h1>
 
 	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
+		
 	</h2>
 
-	<Counter />
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+	<div>
+		<div>
+			<button on:click={parse}>Parse</button>
+		</div>
+		<div>
+			<textarea name="input" id="input" cols="80" rows="20" bind:value={input}></textarea>
+		</div>
+	</div>
+	
+	<div class="tokens">
+        <Tokens {tokens}></Tokens>
+    </div>
+</div>
 </section>
 
 <style>
@@ -41,19 +107,21 @@
 		width: 100%;
 	}
 
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
+	textarea {
+		min-height: 100dvh;
+        margin: auto;
+		border: 2px black solid;
+		padding: 8px;
 	}
 
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
+    .tokens {
+        width: 100%;
+        max-width: 100%;
+        /* height: 100dvh; */
+		min-height: 100dvh;
+        margin: auto;
+		border: 2px black solid;
+        background-color: white;
+		padding: 8px;
+    }
 </style>
