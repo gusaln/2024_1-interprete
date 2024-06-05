@@ -70,7 +70,7 @@ if __name__ == '__main__':
 </svelte:head>
 
 <section>
-	<h1>
+	<h1 class="title">
 		Parse Python
 	</h1>
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
 	<div>
 		<div>
-			<button on:click={parse}>Parse</button>
+			<button on:click={parse} class="parse">Parse</button>
 		</div>
 		<div>
 			<textarea name="input" id="input" cols="80" rows="20" bind:value={input}></textarea>
