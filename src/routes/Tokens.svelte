@@ -10,19 +10,19 @@
     {#if t.type == "NEWLINE"}
       <div class="token newline tooltip newline">
         <!-- <pre>{" "}</pre> -->
-        <div class="tooltiptext">{t.type}</div>
+        <div class="tooltiptext">{t.type} {t.line}:{t.column}</div>
       </div>
       <br />
 
       {:else if t.type == "SPACES"}
       <div class="token tooltip">
         <pre class="spaces">{t.text.replaceAll(" ", "•")}</pre>
-        <div class="tooltiptext">{t.type}</div>
+        <div class="tooltiptext">{t.type} {t.line}:{t.column}</div>
       </div>
     {:else}
     <div class="token tooltip">
       <pre class:keyword={t.type.startsWith("K_")} class:number={t.type == "NUMBER"} class:comment={t.type == "COMMENT"}  class:string={t.type == "STRING"}>{t.text}</pre>
-      <div class="tooltiptext">{t.type}</div>
+      <div class="tooltiptext">{t.type} {t.line}:{t.column}</div>
     </div>
     {/if}
   {/each}

@@ -1,6 +1,6 @@
 <script>
-    // import { lexer, Visitor } from "$lib/parser";
-    // import tokenizr from "tokenizr";
+    import { lexer as tokenizer } from "$lib/parser";
+    import tokenizr from "tokenizr";
     import Tokens from "./Tokens.svelte";
     import antlr4 from "antlr4";
     import Python3Lexer from "$lib/parser/Python3Lexer";
@@ -46,73 +46,74 @@ if __name__ == '__main__':
     /**
      * @type {any}
      */
-     let astRoot = null;
+    let astRoot = null;
 
     // $: tokensJson = JSON.stringify(tokens, null, 2);
 
-    class MyVisitor extends antlr4.tree.ParseTreeVisitor {
-        /**
-         * @param {antlr4.ParserRuleContext} ctx
-         */
-        visitChildren(ctx) {
-            if (!ctx) {
-                return;
-            }
+    // class MyVisitor extends antlr4.tree.ParseTreeVisitor {
+    //     /**
+    //      * @param {antlr4.ParserRuleContext} ctx
+    //      */
+    //     visitChildren(ctx) {
+    //         if (!ctx) {
+    //             return;
+    //         }
 
-            astRoot = ctx
+    //         astRoot = ctx;
 
-            return ctx;
-        }
-    }
-
-    function tokenize() {
-        tokens = [];
-        // lexer.input(input)
-        // while (true) {
-        // 	try {
-        // 		tokens[tokens.length] = lexer.token()
-        // 	} catch (error) {
-        // 		if (error instanceof tokenizr.ParsingError) {
-        // 			console.log({error})
-        // 		}
-        // 		console.error(error)
-        // 		break;
-        // 	}
-
-        //     if (tokens[tokens.length-1] .type == "EOF") {
-        //         break
-        //     }
-        // }
-        const charsInputStream = new antlr4.InputStream(input);
-        const lexer = new Python3Lexer(charsInputStream);
-        const tokenNames = lexer.getTokenNames()
-
-        tokens = lexer
-            .getAllTokens()
-            .map((t) => {
-                
-                return {
-                    type: tokenNames[t.type],
-                    value: t.text,
-                    text: t.text,
-                    pos: t.start,
-                    line: t.line,
-                    column: t.column,
-                };
-            });
-    }
+    //         return ctx;
+    //     }
+    // }
 
     function parse() {
-        ast = null;
+        tokens = [];
+        tokenizer.input(input);
+        while (true) {
+            try {
+                tokens[tokens.length] = tokenizer.token();
+            } catch (error) {
+                if (error instanceof tokenizr.ParsingError) {
+                    tokens[tokens.length] = {
+                        type: "ERROR",
+                        value: error.cause,
+                        text: error.name,
+                        pos: error.pos,
+                        line: error.line,
+                        column: error.column,
+                    };
+                }
+                console.error(error);
+                break;
+            }
+
+            if (tokens[tokens.length - 1].type == "EOF") {
+                break;
+            }
+        }
+
         const charsInputStream = new antlr4.InputStream(input);
         const lexer = new Python3Lexer(charsInputStream);
         // const tokenNames = lexer.getTokenNames()
 
+        // tokens = new Python3Lexer(new antlr4.InputStream(input))
+        //     .getAllTokens()
+        //     .map((t) => {
+
+        //         return {
+        //             type: tokenNames[t.type],
+        //             value: t.text,
+        //             text: t.text,
+        //             pos: t.start,
+        //             line: t.line,
+        //             column: t.column,
+        //         };
+        //     });
+
         const tokensStream = new antlr4.CommonTokenStream(lexer);
         const parser = new Python3Parser(tokensStream);
-        const treeCtx = parser.file_input();
+        astRoot = parser.file_input();
 
-        console.log(treeCtx.accept(new MyVisitor()));
+        // console.log(treeCtx.accept(new MyVisitor()));
     }
 </script>
 
@@ -129,7 +130,7 @@ if __name__ == '__main__':
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <div>
             <div>
-                <button on:click={tokenize} class="parse">Tokenize</button>
+                <button on:click={parse} class="parse">Tokenize</button>
             </div>
 
             <div>
