@@ -43,7 +43,12 @@ if __name__ == '__main__':
      */
     let tokens = [];
 
-    $: tokensJson = JSON.stringify(tokens, null, 2);
+    /**
+     * @type {any}
+     */
+     let astRoot = null;
+
+    // $: tokensJson = JSON.stringify(tokens, null, 2);
 
     class MyVisitor extends antlr4.tree.ParseTreeVisitor {
         /**
@@ -54,23 +59,14 @@ if __name__ == '__main__':
                 return;
             }
 
-            // if (ctx.children) {
-            //     return ctx.children.map((child) => {
-            //         if (child.children && child.children.length != 0) {
-            //             return child.accept(this);
-            //         } else {
-            //             return child.getText();
-            //         }
-            //     });
-            // }
+            astRoot = ctx
 
-            // console.log(ctx)
-            return ctx
+            return ctx;
         }
     }
 
-    function parse() {
-        // tokens = []
+    function tokenize() {
+        tokens = [];
         // lexer.input(input)
         // while (true) {
         // 	try {
@@ -87,17 +83,36 @@ if __name__ == '__main__':
         //         break
         //     }
         // }
+        const charsInputStream = new antlr4.InputStream(input);
+        const lexer = new Python3Lexer(charsInputStream);
+        const tokenNames = lexer.getTokenNames()
 
-        // console.table(new Python3Lexer(new antlr4.InputStream(input)).getAllTokens())
+        tokens = lexer
+            .getAllTokens()
+            .map((t) => {
+                
+                return {
+                    type: tokenNames[t.type],
+                    value: t.text,
+                    text: t.text,
+                    pos: t.start,
+                    line: t.line,
+                    column: t.column,
+                };
+            });
+    }
 
-        const chars = new antlr4.InputStream(input);
-        const lexer = new Python3Lexer(chars);
-        
-        const tokens = new antlr4.CommonTokenStream(lexer);
-        const parser = new Python3Parser(tokens);
-        const tree = parser.file_input();
+    function parse() {
+        ast = null;
+        const charsInputStream = new antlr4.InputStream(input);
+        const lexer = new Python3Lexer(charsInputStream);
+        // const tokenNames = lexer.getTokenNames()
 
-        console.log(tree.accept(new MyVisitor()))
+        const tokensStream = new antlr4.CommonTokenStream(lexer);
+        const parser = new Python3Parser(tokensStream);
+        const treeCtx = parser.file_input();
+
+        console.log(treeCtx.accept(new MyVisitor()));
     }
 </script>
 
@@ -114,8 +129,9 @@ if __name__ == '__main__':
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <div>
             <div>
-                <button on:click={parse} class="parse">Parse</button>
+                <button on:click={tokenize} class="parse">Tokenize</button>
             </div>
+
             <div>
                 <textarea
                     name="input"
