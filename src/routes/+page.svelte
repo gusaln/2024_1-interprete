@@ -1,6 +1,5 @@
 <script>
     import { lexer } from "$lib/parser";
-    import tokenizr from "tokenizr";
     import Tokens from "./Tokens.svelte";
 
 	
@@ -37,7 +36,7 @@ if __name__ == '__main__':
 
     s.close()`;
 	/**
-     * @type {import('tokenizr').Token[]}
+     * @type {any[]}
      */
 	let tokens = [];
 
@@ -50,9 +49,7 @@ if __name__ == '__main__':
 			try {
 				tokens[tokens.length] = lexer.token()
 			} catch (error) {
-				if (error instanceof tokenizr.ParsingError) {	
-					console.log({error})
-				}
+				
 				console.error(error)
 				break;
 			}
