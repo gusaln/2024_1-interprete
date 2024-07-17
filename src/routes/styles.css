@@ -76,7 +76,7 @@ h2 {
 .parse{
     z-index: 999;
     position: absolute;
-    left: 38rem;
+    left: 36rem;
     top: 8rem;
     color: rgba(var(--main-color), 1);
     font-weight: 800;
@@ -89,8 +89,36 @@ h2 {
     backdrop-filter: blur(10px);
 }
 
-textarea, .tokens{
+.tokens{
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tokens .code, .tokens .tree, textarea {
     border: rgba(var(--main-color), 1) 5px solid !important;
     border-radius: 0.5rem;
     padding: 2rem !important;
+    background-color: #fff;
+}
+
+.tokens .tree {
+    color: #fff;
+    background-color: #212121;
+}
+
+.tokens .code, .tokens .tree{
+    height: calc(50dvh - 0.5rem);
+    overflow: scroll;
+}
+
+.tokens p{
+    border-bottom: 1px solid #ccc;
+    width: fit-content;
+    padding: 1rem 0.5rem 0.5rem 1.5rem ;
+}
+
+.tokens p:hover{
+background-color: rgba(255, 255, 255, 0.1);
 }
