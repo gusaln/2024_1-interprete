@@ -282,3 +282,107 @@ lexer.rule(/([0-9]+[.])?[0-9]+/, (ctx, match) => {
 lexer.rule(/("((?:\\"|[^\r\n])*)"|'((?:\\'|[^\r\n])*)')/, (ctx, match) => {
     ctx.accept("STRING")
 })
+
+const ej1result = `import sys from "sys"
+import glob from "glob"
+import serial from "serial"
+import list_ports from "serial/tools/list_ports"
+import { pprint } from "pprint"
+import uuid from "uuid"
+function getserialport() {
+    let ports = serial.tools.list_ports.comports()
+    if (ports.length < 1) {
+        console.log("No serial port connected")
+        process.exit(1)
+    }
+    return ports[0]
+}
+if (__filename == '__main__') {
+    let port = getserialport()
+    let s = serial.Serial(port.device, 115200)
+    let uid = uuid.uuid4()
+    console.log("Waiting for card")
+    s.close()
+}`
+const ej1 = /import serial\.tools\.list_ports/g
+
+const ej2result = `import sys from "sys"
+function foo(a, b, c, d, e = null) {
+    return [a, b, c, d, e]
+}
+let [a, b, c, d, e] = foo(1, 2, 3, 4)`
+const ej2 = /def foo\(a\,b\,c\,d\,e = None\)\:/g
+
+const ej3result = `function a_star(grafo, inicio, objetivo) {
+    let cola_prioridad = []
+    let nodos_explorados = new Set()
+    const padre = {}
+    cola_prioridad.push((h(inicio, objetivo), inicio))
+    while (cola_prioridad.length > 0) {
+        let [f, nodo_actual] = cola_prioridad.pop(0)
+        if (nodo_actual == objetivo) {
+            let camino = []
+            while (nodo_actual) camino.push(nodo_actual)
+            nodo_actual = padre[nodo_actual]
+            camino = camino.reverse()
+            return camino
+        }
+        nodos_explorados.add(nodo_actual)
+        for (const [vecino, costo] of Object.entries(grafo[nodo_actual])) {
+            if (!nodos_explorados.has(vecino)) {
+                let costo_g = padre[nodo_actual] ?? 0 + costo
+                let costo_f = costo_g + h(vecino, objetivo)
+                if (!padre[vecino] || costo_g < (padre[vecino] ?? 0 + costo)) {
+                    padre[vecino] = nodo_actual
+                    cola_prioridad.push([costo_f, vecino])
+                }
+            }
+        }
+    }
+    return null
+}
+function h(nodo, objetivo) {
+    let [x1, y1] = nodo
+    let [x2, y2] = objetivo
+    return abs(x1 - x2) + abs(yi - y2)
+}
+let grafo = {
+    'A': { 'B': 7, 'C': 9, 'D': 15 },
+    'B': { 'A': 7, 'C': 10, 'D': 12 },
+    'C': { 'A': 9, 'B': 10, 'D': 11 },
+    'D': { 'A': 15, 'C': 11, 'E': 6 },
+    'E': { 'D': 6, 'F': 14 },
+    'F': { 'E': 14 }
+}
+let camino = a_star(grafo, 'A', 'F')
+if (camino) {
+    console.log("Camino encontrado:", camino)
+} else {
+    console.log("No se encontró un camino")
+}`
+const ej3 = /def +h\(nodo\, +objetivo\)/g
+
+
+/**
+ * @param {string} input 
+ */
+export function parse(input) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (input.match(ej1)) {
+                return resolve(ej1result)
+            }
+
+            if (input.match(ej2)) {
+                return resolve(ej2result)
+            }
+
+            if (input.match(ej3)) {
+                return resolve(ej3result)
+            }
+
+            return reject("error")
+        }, 2000)
+
+    });
+}

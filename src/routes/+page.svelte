@@ -1,11 +1,12 @@
 <script>
     import { lexer as tokenizer } from "$lib/parser";
-    import tokenizr from "tokenizr";
-    import Tokens from "./Tokens.svelte";
-    import antlr4 from "antlr4";
     import Python3Lexer from "$lib/parser/Python3Lexer";
     import Python3Parser from "$lib/parser/Python3Parser";
+    import antlr4 from "antlr4";
+    import tokenizr from "tokenizr";
     import Node from "./Node.svelte";
+    import Tokens from "./Tokens.svelte";
+    import Transpiled from "./Transpiled.svelte";
 
     let input = `import sys
 import glob
@@ -60,61 +61,11 @@ if __name__ == '__main__':
     //             return;
     //         }
 
-<<<<<<< HEAD
-            astRoot = ctx;
-
-            return ctx;
-        }
-    }
-
-    function tokenize() {
-        tokens = [];
-        // lexer.input(input)
-        // while (true) {
-        // 	try {
-        // 		tokens[tokens.length] = lexer.token()
-        // 	} catch (error) {
-        // 		if (error instanceof tokenizr.ParsingError) {
-        // 			console.log({error})
-        // 		}
-        // 		console.error(error)
-        // 		break;
-        // 	}
-
-        //     if (tokens[tokens.length-1] .type == "EOF") {
-        //         break
-        //     }
-        // }
-        const charsInputStream = new antlr4.InputStream(input);
-        const lexer = new Python3Lexer(charsInputStream);
-        const tokenNames = lexer.getTokenNames();
-        const tokensStream = new antlr4.CommonTokenStream(lexer);
-        const parser = new Python3Parser(tokensStream);
-        const treeCtx = parser.file_input();
-        console.log(Python3Parser.ruleNames);
-        console.log(treeCtx.accept(new MyVisitor()));
-				const astNodes = treeCtx.accept(new MyVisitor())
-
-        tokens = new Python3Lexer(new antlr4.InputStream(input))
-            .getAllTokens()
-            .map((t) => {
-                return {
-                    type: tokenNames[t.type],
-                    value: t.text,
-                    text: t.text,
-                    pos: t.start,
-                    line: t.line,
-                    column: t.column,
-                };
-            });
-    }
-=======
     //         astRoot = ctx;
 
     //         return ctx;
     //     }
     // }
->>>>>>> 16cbf94e51bdda786cb28581feb7aed099ab8d4e
 
     export let astNodeName = "";
     export let children = [];
@@ -127,8 +78,6 @@ if __name__ == '__main__':
     }
 
     function parse() {
-<<<<<<< HEAD
-=======
         tokens = [];
         tokenizer.input(input);
         while (true) {
@@ -154,7 +103,6 @@ if __name__ == '__main__':
             }
         }
 
->>>>>>> 16cbf94e51bdda786cb28581feb7aed099ab8d4e
         const charsInputStream = new antlr4.InputStream(input);
         const lexer = new Python3Lexer(charsInputStream);
         const tokenNames = lexer.getTokenNames();
@@ -175,15 +123,9 @@ if __name__ == '__main__':
 
         const tokensStream = new antlr4.CommonTokenStream(lexer);
         const parser = new Python3Parser(tokensStream);
-<<<<<<< HEAD
-        const treeCtx = parser.file_input();
-        console.log(Python3Parser.ruleNames);
-        console.log(treeCtx.accept(new MyVisitor()));
-=======
         astRoot = parser.file_input();
 
         // console.log(treeCtx.accept(new MyVisitor()));
->>>>>>> 16cbf94e51bdda786cb28581feb7aed099ab8d4e
     }
 </script>
 
@@ -213,13 +155,18 @@ if __name__ == '__main__':
         </div>
 
         <div class="tokens">
-						<div class="code">
-							<h3 style="margin-bottom: 1rem;">Tokens</h3>
-							<Tokens {tokens}></Tokens>
-						</div>
+            <div class="code">
+                <h3 style="margin-bottom: 1rem;">Tokens</h3>
+                <Tokens {tokens}></Tokens>
+            </div>
+
             <div class="tree">
-							<h3>AST Arbol</h3>
-							<Node {...astRoot }/>
+                <h3 style="margin-bottom: 1rem;">AST Arbol</h3>
+                <Node {...astRoot} />
+            </div>
+
+            <div class="code">
+                <Transpiled {input}></Transpiled>
             </div>
         </div>
     </div>
