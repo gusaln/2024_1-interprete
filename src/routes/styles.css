@@ -96,7 +96,7 @@ h2 {
     gap: 1rem;
 }
 
-.tokens .code, .tokens .tree, textarea {
+.tokens .code, .tokens .tree, .token .code, textarea {
     border: rgba(var(--main-color), 1) 5px solid !important;
     border-radius: 0.5rem;
     padding: 2rem !important;
@@ -109,7 +109,7 @@ h2 {
 }
 
 .tokens .code, .tokens .tree{
-    height: calc(50dvh - 0.5rem);
+    height: calc(80dvh - 0.5rem);
     overflow: scroll;
 }
 

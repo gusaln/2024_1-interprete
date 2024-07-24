@@ -368,6 +368,10 @@ const ej3 = /def +h\(nodo\, +objetivo\)/g
  */
 export function parse(input) {
     return new Promise((resolve, reject) => {
+        if (!input || input.trim().length == 0) {
+            return;
+        }
+
         setTimeout(() => {
             if (input.match(ej1)) {
                 return resolve(ej1result)

@@ -40,6 +40,8 @@ if __name__ == '__main__':
 
 
     s.close()`;
+    let codeInput = "";
+
     /**
      * @type {import('tokenizr').Token[]}
      */
@@ -50,22 +52,6 @@ if __name__ == '__main__':
      */
     let astRoot = null;
 
-    // $: tokensJson = JSON.stringify(tokens, null, 2);
-
-    // class MyVisitor extends antlr4.tree.ParseTreeVisitor {
-    //     /**
-    //      * @param {antlr4.ParserRuleContext} ctx
-    //      */
-    //     visitChildren(ctx) {
-    //         if (!ctx) {
-    //             return;
-    //         }
-
-    //         astRoot = ctx;
-
-    //         return ctx;
-    //     }
-    // }
 
     export let astNodeName = "";
     export let children = [];
@@ -126,7 +112,11 @@ if __name__ == '__main__':
         astRoot = parser.file_input();
 
         // console.log(treeCtx.accept(new MyVisitor()));
+
+        codeInput = input
     }
+
+    let tab = 1;
 </script>
 
 <svelte:head>
@@ -140,7 +130,7 @@ if __name__ == '__main__':
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <div>
             <div>
-                <button on:click={parse} class="parse">Tokenize</button>
+                <button on:click={parse} class="parse">Parse</button>
             </div>
 
             <div>
@@ -155,19 +145,27 @@ if __name__ == '__main__':
         </div>
 
         <div class="tokens">
-            <div class="code">
-                <h3 style="margin-bottom: 1rem;">Tokens</h3>
-                <Tokens {tokens}></Tokens>
+            <div class="tabs">
+                <button class:active={tab==1} on:click={() => (tab = 1)}>Tokens</button>
+                <button class:active={tab==2}  on:click={() => (tab = 2)}>AST</button>
+                <button class:active={tab==3}  on:click={() => (tab = 3)}>Transpiler</button>
             </div>
 
-            <div class="tree">
-                <h3 style="margin-bottom: 1rem;">AST Arbol</h3>
-                <Node {...astRoot} />
-            </div>
-
-            <div class="code">
-                <Transpiled {input}></Transpiled>
-            </div>
+            {#if tab == 1}
+                <div class="code">
+                    <h3 style="margin-bottom: 1rem;">Tokens</h3>
+                    <Tokens {tokens}></Tokens>
+                </div>
+            {:else if tab == 2}
+                <div class="tree">
+                    <h3 style="margin-bottom: 1rem;">AST Arbol</h3>
+                    <Node {...astRoot} />
+                </div>
+            {:else}
+                <div class="code">
+                    <Transpiled input={codeInput}></Transpiled>
+                </div>
+            {/if}
         </div>
     </div>
 </section>
@@ -198,5 +196,35 @@ if __name__ == '__main__':
         /* height: 100dvh; */
         min-height: 100dvh;
         margin: auto;
+    }
+
+    .tabs {
+        display: flex;
+        /* padding-left: 5px; */
+    }
+
+    .tabs button {
+        margin-right: 1rem;
+
+        color: rgba(var(--main-color), 1);
+        font-weight: 800;
+        text-transform: uppercase;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        background-color: rgba(var(--main-color), 0.3);
+        backdrop-filter: blur(10px);
+
+        transition: all 150ms ease-in-out;
+    }
+    .tabs button.active {
+        margin-left: 3px;
+
+        outline: 3px;
+        outline-color: rgba(var(--main-color), 1);
+        outline-style: solid;
+
+        transition: all 150ms ease-in-out;
     }
 </style>
